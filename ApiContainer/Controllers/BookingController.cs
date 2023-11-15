@@ -23,6 +23,8 @@ namespace ApiContainer.Controllers
             this.bookingService = bookingService;
             this.appSettings = appSettings;
         }
+
+        [HttpGet]
         public ActionResult Index()
         {
             var bookingList = bookingService.GetListBooking();
@@ -32,32 +34,6 @@ namespace ApiContainer.Controllers
         [Authorize]
         [HttpGet("getByUserId")]
         public ActionResult GetByUserId()
-        {
-            var userId = this.GetUserIdByToken();
-
-            var bookingList = bookingService.GetListBookingByUserId(userId);
-            return Ok(new ResponseApi<List<Booking>>(true, "Get all list booking successfully", bookingList));
-        }
-
-        [Authorize]
-        [HttpPost("create")]
-        public ActionResult Add(AddBookingDto addBookingDto)
-        {
-            try
-            {
-                var userId = this.GetUserIdByToken();
-                var result = bookingService.AddBooking(userId, addBookingDto);
-                return Ok(new ResponseApi<Boolean>(result, "Create booking successfully", result));
-            }
-            catch (Exception)
-            {
-
-                return Unauthorized(new ResponseApi<Boolean>(false, "Forbidden", false));
-
-            }
-        }
-
-        private int GetUserIdByToken()
         {
             var tokenHandler = new JwtSecurityTokenHandler();
             var SecretKey = appSettings.CurrentValue.SecretKey;
@@ -77,7 +53,44 @@ namespace ApiContainer.Controllers
             var jwtToken = (JwtSecurityToken)validatedToken;
             var userId = int.Parse(jwtToken.Claims.First(x => x.Type == "Id").Value);
 
-            return userId;
+            var bookingList = bookingService.GetListBookingByUserId(userId);
+            return Ok(new ResponseApi<List<Booking>>(true, "Get all list booking successfully", bookingList));
         }
+
+        [Authorize]
+        [HttpPost("create")]
+        public ActionResult Add(AddBookingDto addBookingDto)
+        {
+            try
+            {
+                var tokenHandler = new JwtSecurityTokenHandler();
+                var SecretKey = appSettings.CurrentValue.SecretKey;
+                var key = Encoding.ASCII.GetBytes(SecretKey);
+                var token = HttpContext.Request.Headers["Authorization"];
+
+
+                tokenHandler.ValidateToken(token.ToString().Split(" ")[1], new TokenValidationParameters
+                {
+                    ValidateIssuerSigningKey = true,
+                    IssuerSigningKey = new SymmetricSecurityKey(key),
+                    ValidateAudience = false,
+                    ValidateIssuer = false,
+                    ClockSkew = TimeSpan.Zero
+                }, out SecurityToken validatedToken);
+
+                var jwtToken = (JwtSecurityToken)validatedToken;
+                var userId = int.Parse(jwtToken.Claims.First(x => x.Type == "Id").Value);
+                var result = bookingService.AddBooking(userId, addBookingDto);
+                return Ok(new ResponseApi<Boolean>(result, "Create booking successfully", result));
+            }
+            catch (Exception)
+            {
+
+                return Unauthorized(new ResponseApi<Boolean>(false, "Forbidden", false));
+
+            }
+        }
+
+
     }
 }
