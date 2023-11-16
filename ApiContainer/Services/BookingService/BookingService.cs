@@ -17,6 +17,11 @@ namespace ApiContainer.Services.Booking
             return bookingRepository.Create(userId, addBookingDto);
         }
 
+        public bool DeleteBookingById(int userId, string bookingId)
+        {
+            return bookingRepository.Delete(userId, bookingId);
+        }
+
         public List<Models.Booking> GetListBooking()
         {
             return bookingRepository.FindAll();

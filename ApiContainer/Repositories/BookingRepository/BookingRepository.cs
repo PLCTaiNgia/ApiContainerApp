@@ -21,6 +21,24 @@ namespace ApiContainer.Repositories.BookingRepository
             return true;
         }
 
+        public bool Delete(int userId, string bookingId)
+        {
+            try
+            {
+                var booking = Data.bookings.FirstOrDefault(x => x.Id == bookingId && x.UserId == userId);
+
+                if (booking == null)
+                    return false;
+
+                Data.bookings.Remove(booking);
+                return true;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+        }
+
         public List<Booking> FindAll()
         {
             var data = Data.bookings;

@@ -92,5 +92,36 @@ namespace ApiContainer.Controllers
         }
 
 
+        [Authorize]
+        [HttpDelete("{bookingId}")]
+        public ActionResult Delete(string bookingId)
+        {
+
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var SecretKey = appSettings.CurrentValue.SecretKey;
+            var key = Encoding.ASCII.GetBytes(SecretKey);
+            var token = HttpContext.Request.Headers["Authorization"];
+
+
+            tokenHandler.ValidateToken(token.ToString().Split(" ")[1], new TokenValidationParameters
+            {
+                ValidateIssuerSigningKey = true,
+                IssuerSigningKey = new SymmetricSecurityKey(key),
+                ValidateAudience = false,
+                ValidateIssuer = false,
+                ClockSkew = TimeSpan.Zero
+            }, out SecurityToken validatedToken);
+
+            var jwtToken = (JwtSecurityToken)validatedToken;
+            var userId = int.Parse(jwtToken.Claims.First(x => x.Type == "Id").Value);
+
+            var result = bookingService.DeleteBookingById(userId, bookingId);
+
+
+
+            return Ok(new ResponseApi<bool>(result, $"delete booking {string.Format("{0}", result ? "successfully" : "failed")}", result));
+        }
+
+
     }
 }

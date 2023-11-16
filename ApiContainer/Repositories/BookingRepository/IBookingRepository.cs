@@ -8,5 +8,6 @@ namespace ApiContainer.Repositories.BookingRepository
         List<Booking> FindAll();
         Boolean Create(int userId, AddBookingDto addBookingDto);
         List<Booking> FindByUserId(int userId);
+        bool Delete(int userId, string bookingId);
     }
 }

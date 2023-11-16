@@ -28,6 +28,7 @@ namespace ApiContainer.Repositories
         {
             new Booking { Id=Guid.NewGuid().ToString(), UserId = 1, User = users.FirstOrDefault(x => x.Id == 1), ContainerId = "TTTT1000000", Container=containers.FirstOrDefault(x => x.CntrNo =="TTTT1000000") },
             new Booking { Id=Guid.NewGuid().ToString(), UserId = 1, User = users.FirstOrDefault(x => x.Id == 1), ContainerId = "IKON2000007", Container=containers.FirstOrDefault(x => x.CntrNo =="IKON2000007") },
+            new Booking { Id=Guid.NewGuid().ToString(), UserId = 1, User = users.FirstOrDefault(x => x.Id == 1), ContainerId = "NHON0000014", Container=containers.FirstOrDefault(x => x.CntrNo =="NHON0000014") },
         };
 
 
